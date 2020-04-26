@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.views.generic import ListView, View, FormView
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import EmailMessage
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from blog.models import Post
 from blog.forms import EmailPostForm
@@ -26,6 +27,7 @@ class PostListView(ListView):
     template_name = 'blog/post/list.html'
 
 
+
 class PostShareView(FormView):
     def get(self, request, *args, **kwargs):
         post = get_object_or_404(Post, id=kwargs['post_id'], status='published')
@@ -47,4 +49,20 @@ class PostShareView(FormView):
 
         sent = True
         return render(request, 'blog/post/share.html', {'post': post, 'form': form, 'sent': sent})
+
+
+class PostListPagination(View):
+    def get(self, request, *args, **kwargs):
+        object_list = Post.published.all()
+        paginator = Paginator(object_list, 3)  # 3 posts in each page
+        page = request.GET.get('page')
+        try:
+            posts = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer deliver the first page
+            posts = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range deliver last page of results
+            posts = paginator.page(paginator.num_pages)
+        return render(request, 'blog/post/list.html', {'page': page, 'posts': posts})
 

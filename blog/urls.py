@@ -1,5 +1,7 @@
 from django.urls import path, re_path
 from blog.views import PostDetail, PostListView, PostShareView
+from blog.views import PostDetail, PostListView, PostListPagination
+
 
 urlpatterns = [
     path('', PostListView.as_view(), name='post_list'),
@@ -7,4 +9,5 @@ urlpatterns = [
             PostDetail.as_view(),
             name='post_detail'),
     re_path(r'^(?P<post_id>\d+)/share/$', PostShareView.as_view(), name='post_share'),
+    path('pagination/', PostListPagination.as_view(), name='post_list_pagination'),
 ]
