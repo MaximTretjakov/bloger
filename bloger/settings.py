@@ -116,10 +116,10 @@ STATICFILES_DIRS = (
 
 # e-mail settings
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = '000.maximtretyakov.000@gmail.com'
+EMAIL_HOST_USER = 'some_email'
 EMAIL_HOST_PASSWORD = 'some_password'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-DEFAULT_FROM_EMAIL = '000.maximtretyakov.000@gmail.com'
-SERVER_EMAIL = '000.maximtretyakov.000@gmail.com'
+DEFAULT_FROM_EMAIL = 'some_email'
+SERVER_EMAIL = 'some_email'
