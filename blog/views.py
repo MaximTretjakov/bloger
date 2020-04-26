@@ -47,3 +47,4 @@ class PostShareView(FormView):
 
         sent = True
         return render(request, 'blog/post/share.html', {'post': post, 'form': form, 'sent': sent})
+
