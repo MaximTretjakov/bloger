@@ -4,11 +4,11 @@ from django.shortcuts import render, get_object_or_404
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from blog.models import Post
-from blog.forms import EmailPostForm
+from blog.models import Post, Comment
+from blog.forms import EmailPostForm, CommentForm
 
 
-class PostDetail(View):
+class PostDetail(FormView):
     def get(self, request, *args, **kwargs):
         post = get_object_or_404(Post,
                                  slug=kwargs['post'],
@@ -17,7 +17,31 @@ class PostDetail(View):
                                  publish__month=kwargs['month'],
                                  publish__day=kwargs['day'])
 
-        return render(request, 'blog/post/detail.html', {'post': post})
+        comments = post.comments.filter(active=True)
+
+        comment_form = CommentForm()
+        return render(request, 'blog/post/detail.html', {'post': post,
+                                                         'comments': comments,
+                                                         'comment_form': comment_form})
+
+    def post(self, request, *args, **kwargs):
+        post = get_object_or_404(Post,
+                                 slug=kwargs['post'],
+                                 status='published',
+                                 publish__year=kwargs['year'],
+                                 publish__month=kwargs['month'],
+                                 publish__day=kwargs['day'])
+
+        comments = post.comments.filter(active=True)
+
+        comment_form = CommentForm(data=request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.post = post
+            new_comment.save()
+        return render(request, 'blog/post/detail.html', {'post': post,
+                                                         'comments': comments,
+                                                         'comment_form': comment_form})
 
 
 class PostListView(ListView):
@@ -25,7 +49,6 @@ class PostListView(ListView):
     context_object_name = 'posts'
     paginate_by = 3
     template_name = 'blog/post/list.html'
-
 
 
 class PostShareView(FormView):
