@@ -9,5 +9,6 @@ urlpatterns = [
             PostDetail.as_view(),
             name='post_detail'),
     re_path(r'^(?P<post_id>\d+)/share/$', PostShareView.as_view(), name='post_share'),
+    re_path(r'^tag/(?P<tag_slug>[-\w]+)/$', PostListPagination.as_view(), name='post_list_by_tag'),
     path('pagination/', PostListPagination.as_view(), name='post_list_pagination'),
 ]

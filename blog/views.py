@@ -4,6 +4,8 @@ from django.shortcuts import render, get_object_or_404
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from taggit.models import Tag
+
 from blog.models import Post, Comment
 from blog.forms import EmailPostForm, CommentForm
 
@@ -77,15 +79,19 @@ class PostShareView(FormView):
 class PostListPagination(View):
     def get(self, request, *args, **kwargs):
         object_list = Post.published.all()
+
+        tag = None
+        if kwargs['tag_slug']:
+            tag = get_object_or_404(Tag, slug=kwargs['tag_slug'])
+            object_list = object_list.filter(tags__in=[tag])
+
         paginator = Paginator(object_list, 3)  # 3 posts in each page
         page = request.GET.get('page')
         try:
             posts = paginator.page(page)
         except PageNotAnInteger:
-            # If page is not an integer deliver the first page
             posts = paginator.page(1)
         except EmptyPage:
-            # If page is out of range deliver last page of results
             posts = paginator.page(paginator.num_pages)
-        return render(request, 'blog/post/list.html', {'page': page, 'posts': posts})
+        return render(request, 'blog/post/list.html', {'page': page, 'posts': posts, 'tag': tag})
 
